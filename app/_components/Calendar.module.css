@@ -1,0 +1,76 @@
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.month {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+.weekdays {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.day {
+  width: 14.28%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.day.available {
+  background-color: green;
+  color: white;
+}
+
+.day.busy {
+  background-color: red;
+  color: white;
+}
+
+.day.disabled {
+  background-color: #f0f0f0;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.saveButton,
+.cancelButton {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.saveButton {
+  background-color: blue;
+  color: white;
+}
+
+.cancelButton {
+  background-color: grey;
+  color: white;
+}
