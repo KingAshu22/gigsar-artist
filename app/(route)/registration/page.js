@@ -246,48 +246,91 @@ const ArtistRegistration = () => {
             <option value="foreign-artist">Foreign Artist</option>
             <option value="event-manager">Event Manager</option>
             <option value="wedding-planner">Wedding Planner</option>
-            <option value="mc">MC/Host</option>
-            <option value="other">Other</option>
+            <option value="artist-manager">Artist Manager</option>
+            <option value="rapper">Rapper</option>
+            <option value="voice-over-artist">Voice over Artist</option>
+            <option value="session-artist">Session Artist (Musician)</option>
+            <option value="music-composer">Music Composer</option>
+            <option value="lyricist">Lyricist</option>
+            <option value="master-mixing-engineer">
+              Master Mixing Engineer
+            </option>
           </select>
         </div>
+        <button
+          type="submit"
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Submit
+        </button>
+      </form>
+      {/* Confirmation modal */}
+      {isValid ? (
+        <Modal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          title="Are you sure you want to submit the form?"
+          description={`This will create a profile for ${artistName}`}
+        >
+          <div className="flex justify-between">
+            <button
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              type="button"
+              onClick={() => setShowConfirmationModal(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              type="button"
+              onClick={handleConfirmSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        </Modal>
+      ) : (
+        <Modal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          title="Please select correct option of your city"
+          description="Please select correct option of your city name from the option. Manual City names are not acceptable. If there is any error please contact us at +917021630747"
+        >
+          <div className="flex justify-between">
+            <button
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              type="button"
+              onClick={() => setShowConfirmationModal(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
 
-        <div className="text-center">
+      <Modal isOpen={isLoading} title="Submitting Form...">
+        <div className="flex justify-center items-center">
+          <HashLoader color="#dc2626" size={80} />
+        </div>
+      </Modal>
+
+      {error && <p className="error">{error}</p>}
+      <Modal
+        isOpen={success}
+        onClose={() => setSuccess(false)}
+        title="Artist Registered"
+        description={`${artistName}'s Basic Details has been saved successfully. Continue in Artist Dashboard to add more details about you`}
+      >
+        <div className="flex justify-center">
           <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            type="button"
+            onClick={() => router.push("/")}
           >
-            Register
+            Dashboard
           </button>
         </div>
-      </form>
-
-      <Modal
-        isOpen={showConfirmationModal}
-        onClose={() => setShowConfirmationModal(false)}
-        onConfirm={handleConfirmSubmit}
-        title="Confirm Registration"
-        body="Are you sure you want to submit your registration?"
-        confirmText="Confirm"
-        cancelText="Cancel"
-      />
-
-      {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <HashLoader color="#4A90E2" loading={isLoading} />
-        </div>
-      )}
-
-      {error && (
-        <div className="text-center text-red-500 mt-4">
-          <p>Error: {error}</p>
-        </div>
-      )}
-
-      {success && (
-        <div className="text-center text-green-500 mt-4">
-          <p>Success! You have been registered.</p>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };
