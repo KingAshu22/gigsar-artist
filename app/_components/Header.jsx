@@ -24,6 +24,7 @@ const Header = () => {
     sessionStorage.removeItem("mobile");
     sessionStorage.removeItem("authExpiry");
     window.dispatchEvent(new Event("storage")); // Trigger storage event manually
+    window.location.reload(); // Force a page refresh
   }, [router]);
 
   const Menu = [

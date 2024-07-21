@@ -96,9 +96,7 @@ const ArtistRegistration = () => {
       setError(error.message || "An error occurred during submission.");
     } finally {
       // Reset loading state
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
+      setIsLoading(false);
     }
   };
 

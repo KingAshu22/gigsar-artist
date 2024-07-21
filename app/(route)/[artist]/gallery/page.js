@@ -33,9 +33,7 @@ const EditArtist = ({ params }) => {
     } catch (error) {
       console.error("Error fetching artists:", error);
     } finally {
-      setTimeout(() => {
-        setFetchData(false);
-      }, 1000);
+      setFetchData(false);
     }
   };
 
@@ -75,9 +73,7 @@ const EditArtist = ({ params }) => {
       console.error("Error submitting form:", error);
       setError(error.message || "An error occurred during submission.");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
+      setIsLoading(false);
     }
   };
 

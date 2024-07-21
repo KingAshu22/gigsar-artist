@@ -34,9 +34,7 @@ const EditArtist = ({ params }) => {
       console.error("Error fetching artists:", error);
     } finally {
       // Reset loading state
-      setTimeout(() => {
-        setFetchData(false);
-      }, 1000);
+      setFetchData(false);
     }
   };
 
@@ -98,10 +96,8 @@ const EditArtist = ({ params }) => {
       setError(error.message || "An error occurred during submission.");
     } finally {
       // Reset loading state
-      setTimeout(() => {
-        setIsLoading(false);
-        setSuccess(true);
-      }, 3000);
+      setIsLoading(false);
+      setSuccess(true);
     }
   };
 

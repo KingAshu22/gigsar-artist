@@ -58,9 +58,7 @@ const EditArtist = ({ params }) => {
       console.error("Error fetching artist:", error);
     } finally {
       console.log(houseLink);
-      setTimeout(() => {
-        setFetchData(false);
-      }, 1000);
+      setFetchData(false);
     }
   };
 
@@ -74,7 +72,7 @@ const EditArtist = ({ params }) => {
 
   const extractVideoId = (link) => {
     const regex =
-      /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=|shorts\/))([a-zA-Z0-9_-]{11})/;
+      /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     const match = link.match(regex);
     return match ? match[1] : null;
   };
@@ -119,9 +117,7 @@ const EditArtist = ({ params }) => {
       console.error("Error submitting form:", error);
       setError(error.message || "An error occurred during submission.");
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
+      setIsLoading(false);
     }
   };
 
