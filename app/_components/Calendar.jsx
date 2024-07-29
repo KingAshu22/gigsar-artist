@@ -1,105 +1,138 @@
-import { useState } from "react";
+// CalendarComponent.js
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
-  format,
   addMonths,
+  format,
   startOfMonth,
   endOfMonth,
-  addDays,
   startOfWeek,
   endOfWeek,
-  isSameDay,
+  addDays,
   isSameMonth,
+  isSameDay,
+  isBefore,
 } from "date-fns";
 
-const Calendar = () => {
-  const [selectedDates, setSelectedDates] = useState([]);
-  const today = new Date();
-  const monthsToDisplay = 12;
+const CalendarComponent = ({ params }) => {
+  const getArtist = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/artist/artistName/${params.artist}`
+      );
+      const artistData = response.data;
 
-  const toggleDate = (date) => {
-    const dateString = format(date, "yyyy-MM-dd");
-    setSelectedDates((prevSelectedDates) =>
-      prevSelectedDates.includes(dateString)
-        ? prevSelectedDates.filter(
-            (selectedDate) => selectedDate !== dateString
-          )
-        : [...prevSelectedDates, dateString]
-    );
+      setArtistName(artistData.name);
+    } catch (error) {
+      console.error("Error fetching artists:", error);
+    } finally {
+      setFetchData(true);
+    }
   };
 
-  const renderCalendar = () => {
-    const months = [];
-    for (let i = 0; i <= monthsToDisplay; i++) {
-      const monthStart = startOfMonth(addMonths(today, i));
-      const monthEnd = endOfMonth(monthStart);
-      const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
-      const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const [busyDates, setBusyDates] = useState([]);
+  const [artistName, setArtistName] = useState("");
+  const [fetchData, setFetchData] = useState(false);
+  const months = Array.from({ length: 13 }, (_, i) => addMonths(new Date(), i));
 
-      let days = [];
-      let day = startDate;
+  useEffect(() => {
+    getArtist();
+  }, []);
 
-      while (day <= endDate) {
-        const dateString = format(day, "yyyy-MM-dd");
+  const onChange = (date) => {
+    if (busyDates.some((busyDate) => isSameDay(busyDate, date))) {
+      setBusyDates(busyDates.filter((busyDate) => !isSameDay(busyDate, date)));
+    } else {
+      setBusyDates([...busyDates, date]);
+    }
+  };
+
+  const saveDates = async () => {
+    try {
+      const response = await axios.post("/api/save-busy-dates", { busyDates });
+      console.log("Dates saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving dates:", error);
+    }
+  };
+
+  const renderDays = (month) => {
+    const startMonth = startOfMonth(month);
+    const endMonth = endOfMonth(month);
+    const startDate = startOfWeek(startMonth);
+    const endDate = endOfWeek(endMonth);
+
+    const rows = [];
+    let days = [];
+    let day = startDate;
+
+    while (day <= endDate) {
+      for (let i = 0; i < 7; i++) {
+        const cloneDay = day;
+
         days.push(
           <div
-            key={dateString}
-            className={`flex justify-center items-center h-10 w-10 m-1 cursor-pointer rounded ${
-              isSameMonth(day, monthStart)
-                ? selectedDates.includes(dateString)
-                  ? "bg-red-500 text-white"
-                  : "bg-green-500 text-white"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            className={`p-2 text-center cursor-pointer rounded-xl ${
+              !isSameMonth(day, startMonth) || isBefore(day, new Date())
+                ? "text-gray-400"
+                : ""
+            } ${
+              busyDates.some((busyDate) => isSameDay(busyDate, day))
+                ? "bg-red-500 text-white"
+                : ""
             }`}
-            onClick={() => isSameMonth(day, monthStart) && toggleDate(day)}
+            key={day}
+            onClick={() => !isBefore(day, new Date()) && onChange(cloneDay)}
           >
-            {format(day, "d")}
+            <span>{format(day, "d")}</span>
           </div>
         );
         day = addDays(day, 1);
       }
-
-      months.push(
-        <div key={monthStart} className="m-4 p-4 border rounded max-w-lg">
-          <h2 className="text-xl font-bold mb-2">
-            {format(monthStart, "MMMM yyyy")}
-          </h2>
-          <div className="grid grid-cols-7 gap-1 text-center font-bold">
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
-            <div>Sun</div>
-          </div>
-          <div className="grid grid-cols-7 gap-1 mt-2">{days}</div>
+      rows.push(
+        <div className="grid grid-cols-7" key={day}>
+          {days}
         </div>
       );
+      days = [];
     }
-    return months;
+    return <div>{rows}</div>;
   };
 
   return (
-    <div>
-      <div className="h-[80vh] overflow-y-auto">
-        <div className="flex flex-col items-center">{renderCalendar()}</div>
-      </div>
-      <div className="flex justify-center mt-4">
+    fetchData && (
+      <div className="p-4">
+        <h1 className="text-xl font-bold mb-4">
+          Artist Availability Calendar for {artistName}
+        </h1>
+        <div className="space-y-4">
+          {months.map((month, index) => (
+            <div className="bg-white rounded-lg shadow-md p-4" key={index}>
+              <div className="text-center font-semibold mb-2">
+                {format(month, "MMMM yyyy")}
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                  (day) => (
+                    <div className="text-center font-semibold" key={day}>
+                      {day}
+                    </div>
+                  )
+                )}
+              </div>
+              {renderDays(month)}
+            </div>
+          ))}
+        </div>
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mx-2"
-          onClick={() => alert("Saved!")}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={saveDates}
         >
-          Save
-        </button>
-        <button
-          className="px-4 py-2 bg-gray-500 text-white rounded mx-2"
-          onClick={() => setSelectedDates([])}
-        >
-          Cancel
+          Save Busy Dates
         </button>
       </div>
-    </div>
+    )
   );
 };
 
-export default Calendar;
+export default CalendarComponent;
