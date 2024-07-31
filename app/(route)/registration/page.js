@@ -234,7 +234,7 @@ const ArtistRegistration = () => {
           >
             <option value="">Select Artist Type</option>
             <option value="singer-band">Singer/Live Band</option>
-            <option value="musician">Musician</option>
+            <option value="instrumentalist">Instrumentalist</option>
             <option value="dj">DJ</option>
             <option value="comedian">Comedian</option>
             <option value="actor">Actor</option>
