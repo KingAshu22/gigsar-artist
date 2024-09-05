@@ -84,7 +84,12 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       }
       hasScrolledToBottom.current = true; // Prevent future scrolling
     }
-    inputRef.current.focus();
+
+    // Check if the user is on mobile to prevent focusing the input
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+      inputRef.current.focus(); // Only focus input if not on mobile
+    }
   }, [messages, showAvailabilityFooter]);
 
   const formatMessageContent = (content) => {
