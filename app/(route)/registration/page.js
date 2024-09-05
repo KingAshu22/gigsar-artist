@@ -28,9 +28,9 @@ const ArtistRegistration = () => {
   useEffect(() => {
     // Only run this effect on the client
     if (typeof window !== "undefined") {
-      setExpiryTime(sessionStorage.getItem("authExpiry"));
-      setContactNumber("+" + sessionStorage.getItem("mobile"));
-      setLocation(sessionStorage.getItem("city"));
+      setExpiryTime(localStorage.getItem("authExpiry"));
+      setContactNumber("+" + localStorage.getItem("mobile"));
+      setLocation(localStorage.getItem("city"));
     }
   }, []);
 

@@ -21,8 +21,8 @@ const Header = () => {
   }, []);
 
   const handleSignOut = useCallback(() => {
-    sessionStorage.removeItem("mobile");
-    sessionStorage.removeItem("authExpiry");
+    localStorage.removeItem("mobile");
+    localStorage.removeItem("authExpiry");
     window.dispatchEvent(new Event("storage")); // Trigger storage event manually
     window.location.reload(); // Force a page refresh
   }, [router]);
@@ -31,7 +31,6 @@ const Header = () => {
     { id: 1, name: "Home", path: "/" },
     { id: 2, name: "Artist Search", path: "/artist" },
     { id: 3, name: "Artist Login", path: "/" },
-    { id: 4, name: "User Login", path: "/user-dashboard" },
   ];
 
   return (

@@ -12,6 +12,7 @@ import {
   Music,
   TicketCheck,
   User,
+  MessageCircle, // Added for the chat card icon
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +37,7 @@ function ArtistDashboard() {
   });
 
   useEffect(() => {
-    const storedNumber = sessionStorage?.getItem("mobile");
+    const storedNumber = localStorage?.getItem("mobile");
     console.log("Stored Number:", storedNumber);
 
     if (storedNumber !== undefined) {
@@ -312,6 +313,42 @@ function ArtistDashboard() {
         </div>
       )}
 
+      {/* Added Calendar and Chat cards at the top */}
+      <div className="mb-5">
+        <h2 className="text-xl md:text-2xl font-bold mb-3">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Calendar Card */}
+          <Link href={`/${artist?.linkid}/calendar`}>
+            <Card>
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center">
+                <CalendarDays className="hidden sm:block" />
+                <div className="ml-0 sm:ml-4 mt-2 sm:mt-0">
+                  <CardTitle>Calendar</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="mt-2 sm:mt-4">
+                <p>Manage Your Calendar</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Chat Card */}
+          <Link href="/chat">
+            <Card>
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center">
+                <MessageCircle className="hidden sm:block" />
+                <div className="ml-0 sm:ml-4 mt-2 sm:mt-0">
+                  <CardTitle>Chat</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="mt-2 sm:mt-4">
+                <p>Communicate with your audience</p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
       <div className="mb-5">
         <h2 className="text-xl md:text-2xl font-bold mb-3">
           {profileCompletion === 100 ? "Edit Data" : "Completed Tasks"}
@@ -334,24 +371,6 @@ function ArtistDashboard() {
           ))}
         </div>
       </div>
-
-      {profileCompletion === 100 && (
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
-          <Link href={`/${artist?.linkid}/calendar`}>
-            <Card>
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center">
-                <CalendarDays className="hidden sm:block" />
-                <div className="ml-0 sm:ml-4 mt-2 sm:mt-0">
-                  <CardTitle>Calendar</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="mt-2 sm:mt-4">
-                <p>Manage Your Calendar</p>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      )}
     </div>
   );
 }

@@ -54,9 +54,9 @@ export default function SignIn() {
             const user = {
               phone,
             };
-            sessionStorage.setItem("user", JSON.stringify(user));
-            sessionStorage.setItem("authToken", response.token);
-            sessionStorage.setItem(
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("authToken", response.token);
+            localStorage.setItem(
               "authExpiry",
               Date.now() + 7 * 24 * 60 * 60 * 1000
             );
