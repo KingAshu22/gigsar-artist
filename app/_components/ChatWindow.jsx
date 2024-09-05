@@ -33,6 +33,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
   const [messages, setMessages] = useState(selectedChat.message);
   const [newMessage, setNewMessage] = useState("");
   const [showAvailabilityFooter, setShowAvailabilityFooter] = useState(false);
+  const [isProcessingResponse, setIsProcessingResponse] = useState(false); // New state to avoid rapid re-renders
 
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
@@ -139,17 +140,21 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       ]);
       setNewMessage("");
       setShowAvailabilityFooter(false); // Hide the availability footer after sending a response
+      setIsProcessingResponse(false); // Reset processing flag
       hasScrolledToBottom.current = false; // Reset scroll flag to scroll when new message is sent
     }
   };
 
   const handleAvailabilityResponse = (response) => {
-    if (response === "Yes") {
-      handleSendMessage(
-        "Yes, I am available for the event. Kindly proceed with further booking steps."
-      );
-    } else {
-      handleSendMessage("Sorry, I am not available on this date.");
+    if (!isProcessingResponse) {
+      setIsProcessingResponse(true); // Prevent multiple responses being processed
+      if (response === "Yes") {
+        handleSendMessage(
+          "Yes, I am available for the event. Kindly proceed with further booking steps."
+        );
+      } else {
+        handleSendMessage("Sorry, I am not available on this date.");
+      }
     }
   };
 
