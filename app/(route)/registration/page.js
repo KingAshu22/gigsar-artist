@@ -30,7 +30,6 @@ const ArtistRegistration = () => {
     if (typeof window !== "undefined") {
       setExpiryTime(localStorage.getItem("authExpiry"));
       setContactNumber("+" + localStorage.getItem("mobile"));
-      setLocation(localStorage.getItem("city"));
     }
   }, []);
 
