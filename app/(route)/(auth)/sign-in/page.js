@@ -131,7 +131,7 @@ export default function SignIn() {
           <LottieImg animationData={animationData} />
         </div>
       ) : (
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-primary">
             Sign In
           </h2>
@@ -146,7 +146,7 @@ export default function SignIn() {
               >
                 Mobile Number
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 w-full">
                 {countryFlag && (
                   <Image
                     src={countryFlag}
@@ -160,7 +160,7 @@ export default function SignIn() {
                   type="number"
                   id="mobile-input"
                   placeholder="Enter mobile number"
-                  className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
