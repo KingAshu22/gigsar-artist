@@ -11,7 +11,6 @@ import {
   Type,
   User,
 } from "lucide-react";
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player/lazy";
 import { formatToIndianNumber } from "@/lib/utils";
@@ -191,14 +190,16 @@ function ArtistDetail({ artist }) {
     <div className="container mx-auto p-5">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="flex justify-center md:justify-start">
-          <Image
-            src={artist.profilePic}
-            width={200}
-            height={200}
-            alt={artist.name}
-            className="border rounded-lg w-full h-auto object-cover cursor-pointer"
-            onClick={() => openModal(artist.profilePic)}
-          />
+          {artist.profilePic !== "" && (
+            <img
+              src={artist.profilePic}
+              width={200}
+              height={200}
+              alt={artist.name}
+              className="border rounded-lg w-full h-auto object-cover cursor-pointer"
+              onClick={() => openModal(artist.profilePic)}
+            />
+          )}
         </div>
         <div className="col-span-2 flex flex-col gap-4">
           <h2 className="font-bold text-3xl text-gray-800">{artist.name}</h2>
@@ -245,14 +246,16 @@ function ArtistDetail({ artist }) {
         <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mb-20">
           {artist.gallery.map((link, index) => (
             <div key={index} className="w-full">
-              <Image
-                src={link.link}
-                width={200}
-                height={200}
-                alt={artist.name}
-                className="border rounded-lg object-cover cursor-pointer"
-                onClick={() => openModal(link.link)}
-              />
+              {link.link !== "" && (
+                <img
+                  src={link.link}
+                  width={200}
+                  height={200}
+                  alt={artist.name}
+                  className="border rounded-lg object-cover cursor-pointer"
+                  onClick={() => openModal(link.link)}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -286,15 +289,17 @@ function ArtistDetail({ artist }) {
       </div>
 
       {/* Modal for Gallery Images */}
-      <Modal isOpen={modalOpen} onClose={closeModal} title="Gallery Image">
+      <Modal isOpen={modalOpen} onClose={closeModal} title="Gallery img">
         <div className="flex justify-center">
-          <Image
-            src={selectedImage}
-            width={400}
-            height={400}
-            alt="Selected Image"
-            className="border rounded-lg object-contain"
-          />
+          {selectedImage !== "" && (
+            <img
+              src={selectedImage}
+              width={400}
+              height={400}
+              alt="Selected img"
+              className="border rounded-lg object-contain"
+            />
+          )}
         </div>
         <div className="flex justify-center mt-4">
           <Button onClick={closeModal}>Close</Button>
