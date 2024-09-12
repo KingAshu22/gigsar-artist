@@ -55,6 +55,7 @@ export default function SignIn() {
           localStorage.setItem("authExpiry", authExpiry.toString());
           localStorage.setItem("mobile", mobile.toString());
           localStorage.setItem("city", city.toString());
+          sessionStorage.setItem("hasRefreshed", "false");
           router.push(returnUrl);
         };
 
@@ -128,7 +129,7 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center p-4">
       {showVerifiedGif ? (
         <div className="flex items-center justify-center">
-          <LottieImg animationData={animationData} />
+          <LottieImg animationData={animationData} loop={false} />
         </div>
       ) : (
         <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md">

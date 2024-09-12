@@ -4,9 +4,10 @@ export default function LottieImg({
   animationData,
   height = 300,
   width = 300,
+  loop = true,
 }) {
   const defaultOptions = {
-    loop: true,
+    loop: loop,
     autoplay: true,
     animationData: animationData,
     rendererSettings: {

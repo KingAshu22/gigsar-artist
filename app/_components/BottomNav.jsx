@@ -48,17 +48,23 @@ export default function BottomNav() {
   };
 
   const navItems = [
-    { path: "/", icon: <LayoutDashboard /> },
-    { path: "/chat", icon: <MessagesSquare /> },
+    { path: "/", icon: <LayoutDashboard />, label: "Dashboard" },
+    { path: "/chat", icon: <MessagesSquare />, label: "Chat" },
     {
       path: `/${linkId}/calendar`,
       icon: <Calendar />,
+      label: "Calendar",
     },
   ];
 
+  // Render only the Header if not authenticated (i.e., no mobile number)
+  if (!mobileNumber) {
+    return <Header />;
+  }
+
   return (
     <>
-      <div className="bg-[#1B0311] fixed bottom-0 left-0 right-0 overflow-x-hidden">
+      <div className="bg-[#3E3636] fixed bottom-0 left-0 right-0 overflow-x-hidden">
         <nav className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {navItems.map(({ path, icon, label }) => (
