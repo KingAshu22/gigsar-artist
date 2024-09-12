@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "./_components/Header";
 import Footer from "./_components/Footer";
 import { Toaster } from "sonner";
+import BottomNav from "./_components/BottomNav";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -17,7 +18,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={outfit.className}>
         <div className="md:px-20">
-          <Header></Header>
+          <div className="desktop">
+            <Header></Header>
+          </div>
+          <div className="mobile">
+            <BottomNav />
+          </div>
           {children}
           <Toaster />
         </div>
