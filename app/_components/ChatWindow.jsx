@@ -93,7 +93,27 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
     }
   }, [messages, showAvailabilityFooter]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault(); // Prevents the default action of the Enter key
+        handleSendMessage();
+      }
+    };
+
+    const input = inputRef.current;
+    input.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      input.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [newMessage]);
+
   const formatMessageContent = (content) => {
+    if (typeof content !== "string") {
+      return <p>{content}</p>; // Safely render the content as it is if it's not a string
+    }
+
     return content
       .split("\n")
       .filter((line) => line.trim() !== "")
@@ -110,7 +130,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       });
   };
 
-  const handleSendMessage = async (response = null) => {
+  const handleSendMessage = async (event, response = null) => {
     let messageContent = newMessage.trim();
     if (response) {
       messageContent = response;
@@ -150,10 +170,14 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       setIsProcessingResponse(true); // Prevent multiple responses being processed
       if (response === "Yes") {
         handleSendMessage(
+          { preventDefault: () => {} }, // Provide an empty event object since we're not using an actual event here
           "Yes, I am available for the event. Kindly proceed with further booking steps."
         );
       } else {
-        handleSendMessage("Sorry, I am not available on this date.");
+        handleSendMessage(
+          { preventDefault: () => {} },
+          "Sorry, I am not available on this date."
+        );
       }
     }
   };
@@ -226,7 +250,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
         />
         <button
           className="bg-primary text-white px-4 py-2 rounded-lg"
-          onClick={handleSendMessage}
+          onClick={(e) => handleSendMessage(e)} // Pass the event object explicitly
         >
           <SendHorizonal />
         </button>
