@@ -55,7 +55,7 @@ export default function SignIn() {
           localStorage.setItem("authExpiry", authExpiry.toString());
           localStorage.setItem("mobile", mobile.toString());
           localStorage.setItem("city", city.toString());
-          sessionStorage.setItem("hasRefreshed", "false");
+          localStorage.setItem("hasRefreshed", "false");
           router.push(returnUrl);
         };
 

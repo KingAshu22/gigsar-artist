@@ -18,7 +18,7 @@ const Header = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [profilePic, setProfilePic] = useState("");
   const [linkId, setLinkId] = useState("");
-  const isAuthenticated = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(useAuth());
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Header = () => {
     if (storedNumber !== undefined) {
       setMobileNumber(JSON?.parse(storedNumber));
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (mobileNumber) {
@@ -54,6 +54,18 @@ const Header = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    setInterval(() => {
+      const mobile = localStorage.getItem("mobile");
+      const authExpiry = localStorage.getItem("authExpiry");
+      if (mobile && authExpiry && Date.now() < parseInt(authExpiry, 10)) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    }, []);
+  }, 2000);
 
   const handleSignOut = useCallback(() => {
     localStorage.removeItem("mobile");

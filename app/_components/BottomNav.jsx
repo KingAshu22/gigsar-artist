@@ -6,10 +6,12 @@ import { LayoutDashboard, MessagesSquare, Calendar } from "lucide-react";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import useAuth from "@/lib/hook";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const [mobileNumber, setMobileNumber] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(useAuth());
   const [linkId, setLinkId] = useState("");
 
   // Fetch the mobile number from localStorage
@@ -21,7 +23,7 @@ export default function BottomNav() {
     } else {
       console.warn("Mobile number not found in localStorage");
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Fetch artist details when mobile number is available
   useEffect(() => {
@@ -47,6 +49,18 @@ export default function BottomNav() {
     }
   };
 
+  useEffect(() => {
+    setInterval(() => {
+      const mobile = localStorage.getItem("mobile");
+      const authExpiry = localStorage.getItem("authExpiry");
+      if (mobile && authExpiry && Date.now() < parseInt(authExpiry, 10)) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    }, []);
+  }, 2000);
+
   const navItems = [
     { path: "/", icon: <LayoutDashboard />, label: "Dashboard" },
     { path: "/chat", icon: <MessagesSquare />, label: "Chat" },
@@ -64,30 +78,32 @@ export default function BottomNav() {
 
   return (
     <>
-      <div className="bg-[#3E3636] fixed bottom-0 left-0 right-0 overflow-x-hidden">
-        <nav className="container mx-auto px-4 py-2">
-          <div className="flex justify-between items-center">
-            {navItems.map(({ path, icon, label }) => (
-              <Link
-                href={path}
-                key={path}
-                className={`flex flex-col items-center justify-center text-white transition-all duration-200 ${
-                  pathname === path ? "bg-red-500 rounded-lg p-1" : "p-2"
-                }`}
-              >
-                <div
-                  className={`p-2 rounded-full transition-transform duration-200 ${
-                    pathname === path ? "scale-110" : ""
+      {isAuthenticated && (
+        <div className="bg-[#3E3636] fixed bottom-0 left-0 right-0 overflow-x-hidden">
+          <nav className="container mx-auto px-4 py-2">
+            <div className="flex justify-between items-center">
+              {navItems.map(({ path, icon, label }) => (
+                <Link
+                  href={path}
+                  key={path}
+                  className={`flex flex-col items-center justify-center text-white transition-all duration-200 ${
+                    pathname === path ? "bg-red-500 rounded-lg p-1" : "p-2"
                   }`}
                 >
-                  {icon}
-                </div>
-                <span className="text-xs md:text-sm">{label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-      </div>
+                  <div
+                    className={`p-2 rounded-full transition-transform duration-200 ${
+                      pathname === path ? "scale-110" : ""
+                    }`}
+                  >
+                    {icon}
+                  </div>
+                  <span className="text-xs md:text-sm">{label}</span>
+                </Link>
+              ))}
+            </div>
+          </nav>
+        </div>
+      )}
       <Header />
     </>
   );

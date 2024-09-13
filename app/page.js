@@ -26,7 +26,6 @@ import { Button } from "@/components/ui/button";
 
 function ArtistDashboard() {
   const router = useRouter();
-
   const [mobileNumber, setMobileNumber] = useState("");
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
