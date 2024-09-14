@@ -87,12 +87,14 @@ export default function BottomNav() {
                   href={path}
                   key={path}
                   className={`flex flex-col items-center justify-center text-white transition-all duration-200 ${
-                    pathname === path ? "bg-red-500 rounded-lg p-1" : "p-2"
+                    pathname.startsWith(path)
+                      ? "bg-red-500 rounded-lg p-1"
+                      : "p-2"
                   }`}
                 >
                   <div
                     className={`p-2 rounded-full transition-transform duration-200 ${
-                      pathname === path ? "scale-110" : ""
+                      pathname.startsWith(path) ? "scale-110" : ""
                     }`}
                   >
                     {icon}

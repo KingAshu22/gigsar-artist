@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import getClientUsername from "../helpers/clientUsername";
 
 // Helper function to truncate message content
 const truncateMessage = (message, maxLength = 30) => {
@@ -33,9 +35,26 @@ const formatTime = (timeStr) => {
 };
 
 const ChatList = ({ setSelectedChat, chats }) => {
+  const [usernames, setUsernames] = useState({});
+
   const getLastMessage = (messages) => {
     return messages[messages.length - 1];
   };
+
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const usernameMap = {};
+      for (const chat of chats) {
+        const username = await getClientUsername(chat.clientId);
+        if (username) {
+          usernameMap[chat.clientId] = username;
+        }
+      }
+      setUsernames(usernameMap);
+    };
+
+    fetchUsernames();
+  }, [chats]);
 
   // Sort chats based on the timestamp of the last message
   const sortedChats = [...chats].sort((a, b) => {
@@ -55,7 +74,7 @@ const ChatList = ({ setSelectedChat, chats }) => {
         {sortedChats.map((chat) => {
           const lastMessage = getLastMessage(chat.message);
           const isUnread = lastMessage.isUnread;
-          const combinedName = `${chat.clientId}`;
+          const username = usernames[chat.clientId] || chat.clientId;
 
           return (
             <li
@@ -64,7 +83,7 @@ const ChatList = ({ setSelectedChat, chats }) => {
               onClick={() => setSelectedChat(chat)}
             >
               <div className="flex-grow">
-                <h3 className="text-md font-medium">{combinedName}</h3>
+                <h3 className="text-md font-medium">{username}</h3>
                 <p className="text-sm text-gray-600">
                   {truncateMessage(lastMessage.content)}
                 </p>

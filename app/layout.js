@@ -25,6 +25,7 @@ export default function RootLayout({ children }) {
             <BottomNav />
           </div>
           {children}
+          <div className="mobile pb-24"></div>
           <Toaster />
         </div>
       </body>

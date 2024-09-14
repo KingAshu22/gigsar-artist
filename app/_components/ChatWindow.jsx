@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ChevronLeft, SendHorizonal } from "lucide-react";
 import { io } from "socket.io-client";
+import getClientUsername from "../helpers/clientUsername";
 
 // Utility function to capitalize each word
 const capitalizeWords = (str) => {
@@ -33,6 +34,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
   const [messages, setMessages] = useState(selectedChat.message);
   const [newMessage, setNewMessage] = useState("");
   const [showAvailabilityFooter, setShowAvailabilityFooter] = useState(false);
+  const [username, setUsername] = useState("");
   const [isProcessingResponse, setIsProcessingResponse] = useState(false); // New state to avoid rapid re-renders
 
   const socket = useRef(null);
@@ -64,6 +66,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
 
   useEffect(() => {
     setMessages(selectedChat.message);
+    setUsername(getClientUsername(selectedChat.clientId));
     const lastMessage = selectedChat.message[selectedChat.message.length - 1];
     if (
       lastMessage &&
@@ -190,9 +193,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
         </button>
         <div className="flex items-center">
           <div>
-            <h2 className="text-lg font-semibold pl-2">
-              {selectedChat.clientId}
-            </h2>
+            <h2 className="text-lg font-semibold pl-2">{username}</h2>
           </div>
         </div>
       </div>

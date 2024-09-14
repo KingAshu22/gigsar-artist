@@ -42,6 +42,8 @@ const ArtistChat = () => {
     });
 
     socket.on("messageReceived", (data) => {
+      console.log(data);
+
       if (data.artistId === artistId) {
         setChats((prevChats) => {
           const chatExists = prevChats.find(
@@ -108,10 +110,10 @@ const ArtistChat = () => {
       client.messages.forEach((messageGroup) => {
         const { artistId, message } = messageGroup;
         const lastMessage = message[message.length - 1];
-
         chatData.push({
           artistId,
           clientId: client.clientId,
+          clientUsername: client.clientUsername,
           clientName: client.clientName,
           clientContact: client.clientContact,
           clientEmail: client.clientEmail,
