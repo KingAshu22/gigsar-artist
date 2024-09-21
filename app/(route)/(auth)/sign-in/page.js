@@ -134,7 +134,7 @@ export default function SignIn() {
       ) : (
         <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-primary">
-            Sign In
+            Artist Sign In
           </h2>
           <p className="text-center text-gray-500 mb-8">
             Sign in to access your dashboard
