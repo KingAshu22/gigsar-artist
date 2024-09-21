@@ -1,4 +1,5 @@
 const genreOptions = [
+  "Bryan Adams Songs",
   "2-step garage",
   "20th-century classical music",
   "4-beat",
