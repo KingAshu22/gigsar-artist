@@ -17,13 +17,25 @@ const ArtistChat = () => {
   const [artistId, setArtistId] = useState("");
 
   const getArtistId = async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API}/artist/contact/+${localStorage.getItem(
-        "mobile"
-      )}`
-    );
+    // Extract mobile number from the URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const mobileFromUrl = searchParams.get("mobile");
 
-    setArtistId(response.data.linkid);
+    // Use mobile from URL if present, otherwise fallback to localStorage
+    const mobile = mobileFromUrl || localStorage.getItem("mobile");
+
+    if (mobile) {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API}/artist/contact/+${mobile}`
+        );
+        setArtistId(response.data.linkid);
+      } catch (error) {
+        console.error("Error fetching artist ID:", error);
+      }
+    } else {
+      console.error("No mobile number found");
+    }
   };
 
   useEffect(() => {
