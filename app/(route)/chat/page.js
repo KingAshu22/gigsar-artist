@@ -22,12 +22,12 @@ const ArtistChat = () => {
     const mobileFromUrl = searchParams.get("mobile");
 
     // Use mobile from URL if present, otherwise fallback to localStorage
-    const mobile = mobileFromUrl || localStorage.getItem("mobile");
+    const mobile = mobileFromUrl || "+" + localStorage.getItem("mobile");
 
     if (mobile) {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API}/artist/contact/+${mobile}`
+          `${process.env.NEXT_PUBLIC_API}/artist/contact/${mobile}`
         );
         setArtistId(response.data.linkid);
       } catch (error) {
