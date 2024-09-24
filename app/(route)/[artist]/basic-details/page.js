@@ -88,14 +88,21 @@ const basicDetails = ({ params }) => {
     try {
       setShowConfirmationModal(false);
       setIsLoading(true);
+
+      // Clean up location: remove everything after the first comma
+      const formattedLocation = location.split(",")[0].trim();
+
+      // Clean up artist name: remove extra spaces from both ends
+      const formattedArtistName = artistName.trim();
+
       // Handle the submission of form data
       const formData = {
-        artistName,
+        artistName: formattedArtistName,
         profilePic,
         gender,
         contactNumber,
         email,
-        location,
+        location: formattedLocation,
         artistType,
       };
 

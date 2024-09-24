@@ -80,10 +80,10 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       if (!isAutoReplied) {
         if (reply === "yes") {
           handleAvailabilityResponse("Yes");
-          setIsAutoReplied(true); // Reset to false to avoid rapid re-renders
+          setIsAutoReplied(true); // Reset to true to avoid rapid re-renders
         } else if (reply === "no") {
           handleAvailabilityResponse("No");
-          setIsAutoReplied(true); // Reset to false to avoid rapid re-renders
+          setIsAutoReplied(true); // Reset to true to avoid rapid re-renders
         }
       }
     } else {
