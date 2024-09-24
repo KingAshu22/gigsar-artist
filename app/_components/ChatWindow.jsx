@@ -35,6 +35,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
   const [newMessage, setNewMessage] = useState("");
   const [showAvailabilityFooter, setShowAvailabilityFooter] = useState(false);
   const [username, setUsername] = useState("");
+  const [isAutoReplied, setIsAutoReplied] = useState(false);
   const [isProcessingResponse, setIsProcessingResponse] = useState(false); // New state to avoid rapid re-renders
 
   const socket = useRef(null);
@@ -74,6 +75,17 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       lastMessage.content.startsWith("Category")
     ) {
       setShowAvailabilityFooter(true);
+      const searchParams = new URLSearchParams(window.location.search);
+      const reply = searchParams.get("reply");
+      if (!isAutoReplied) {
+        if (reply === "yes") {
+          handleAvailabilityResponse("Yes");
+          setIsAutoReplied(true); // Reset to false to avoid rapid re-renders
+        } else if (reply === "no") {
+          handleAvailabilityResponse("No");
+          setIsAutoReplied(true); // Reset to false to avoid rapid re-renders
+        }
+      }
     } else {
       setShowAvailabilityFooter(false);
     }
