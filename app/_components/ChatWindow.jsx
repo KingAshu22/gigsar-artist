@@ -100,12 +100,6 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
       }
       hasScrolledToBottom.current = true; // Prevent future scrolling
     }
-
-    // Check if the user is on mobile to prevent focusing the input
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    if (!isMobile) {
-      inputRef.current.focus(); // Only focus input if not on mobile
-    }
   }, [messages, showAvailabilityFooter]);
 
   useEffect(() => {
@@ -235,39 +229,44 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
           </div>
         ))}
         {showAvailabilityFooter && (
-          <div ref={footerRef} className="p-3 bg-gray-200 text-center">
-            <p className="text-sm">Are You Available?</p>
-            <button
-              className="bg-green-500 text-white px-3 py-1 rounded-lg mx-2"
-              onClick={() => handleAvailabilityResponse("Yes")}
-            >
-              Yes
-            </button>
-            <button
-              className="bg-red-500 text-white px-3 py-1 rounded-lg mx-2"
-              onClick={() => handleAvailabilityResponse("No")}
-            >
-              No
-            </button>
-          </div>
+          <>
+            <div className="p-3 pb-6 bg-gray-200 text-center">
+              <p className="text-sm">Are You Available?</p>
+              <button
+                className="bg-green-500 text-white px-3 py-1 rounded-lg mx-2"
+                onClick={() => handleAvailabilityResponse("Yes")}
+              >
+                Yes
+              </button>
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded-lg mx-2"
+                onClick={() => handleAvailabilityResponse("No")}
+              >
+                No
+              </button>
+            </div>
+          </>
         )}
       </div>
-      <div className="p-4 border-t border-gray-300 flex items-center space-x-2">
-        <input
-          type="text"
-          className="flex-grow p-2 border rounded-lg"
-          placeholder="Type a message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          ref={inputRef}
-        />
-        <button
-          className="bg-primary text-white px-4 py-2 rounded-lg"
-          onClick={(e) => handleSendMessage(e)} // Pass the event object explicitly
-        >
-          <SendHorizonal />
-        </button>
-      </div>
+      {!showAvailabilityFooter && (
+        <div className="p-4 border-t border-gray-300 flex items-center space-x-2">
+          <input
+            type="text"
+            className="flex-grow p-2 border rounded-lg"
+            placeholder="Type a message"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            ref={inputRef}
+          />
+          <button
+            className="bg-primary text-white px-4 py-2 rounded-lg"
+            onClick={(e) => handleSendMessage(e)} // Pass the event object explicitly
+          >
+            <SendHorizonal />
+          </button>
+        </div>
+      )}
+      <div ref={footerRef} />
     </div>
   );
 };
