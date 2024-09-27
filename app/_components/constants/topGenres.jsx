@@ -1,5 +1,6 @@
 export const topGenres = [
-  "Bollywood / Filmi / Hindi",
+  "Bollywood/New",
+  "Bollywood/Retro/Old",
   "English/Western",
   "Punjabi",
   "Ghazal",
@@ -9,8 +10,7 @@ export const topGenres = [
   "Pop",
   "Jazz",
   "Electronic",
-  "Retro / Old (Bollywood / Hindi)",
-  "Orchestra (Bollywood Retro)",
+  "Orchestra",
   "Symphony",
   "Karaoke",
   "English Retro",

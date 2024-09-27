@@ -239,7 +239,7 @@ const ArtistRegistration = () => {
             type="text"
             id="location"
             value={location}
-            autoComplete="off"
+            autoComplete="new-password"
             ref={inputRef}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="City"
