@@ -5,7 +5,6 @@ import PhotoUploader from "@/app/_components/PhotoUploader";
 import { useRouter } from "next/navigation";
 import Modal from "@/app/_components/Modal";
 import { HashLoader } from "react-spinners";
-import { Button } from "@/components/ui/button";
 import Script from "next/script";
 
 const basicDetails = ({ params }) => {
@@ -48,7 +47,6 @@ const basicDetails = ({ params }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [fetchData, setFetchData] = useState(true);
-  const [isNameExist, setIsNameExist] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -81,16 +79,6 @@ const basicDetails = ({ params }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Clean up artist name: remove extra spaces from both ends
-    const formattedArtistName = artistName.trim();
-
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API}/artistName/${formattedArtistName}`
-    );
-    if (response.status === 200) {
-      setIsNameExist(true);
-      return;
-    }
     setShowConfirmationModal(true);
     setError(null);
     setSuccess(false);
@@ -170,6 +158,7 @@ const basicDetails = ({ params }) => {
             id="artistName"
             value={artistName}
             required
+            readOnly
             onChange={(e) => setArtistName(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
@@ -346,21 +335,6 @@ const basicDetails = ({ params }) => {
           >
             Dashboard
           </button>
-        </div>
-      </Modal>
-      <Modal
-        isOpen={isNameExist}
-        title={"Name Already Exists"}
-        onClose={() => {
-          setIsNameExist(false);
-        }}
-      >
-        <p className="text-center">
-          Artist Already exist with name <strong>{artistName}</strong>.<br />{" "}
-          Kindly fill any other Name.
-        </p>
-        <div className="flex justify-center mt-4">
-          <Button onClick={() => setIsNameExist(false)}>Close</Button>
         </div>
       </Modal>
     </div>

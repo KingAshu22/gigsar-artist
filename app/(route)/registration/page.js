@@ -62,19 +62,31 @@ const ArtistRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Clean up artist name: remove extra spaces from both ends
-    const formattedArtistName = artistName.trim();
 
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API}/artistName/${formattedArtistName}`
-    );
-    if (response.status === 200) {
-      setIsNameExist(true);
-      return;
+    // Clean up artist name: remove extra spaces from both ends
+    const formattedArtistName = artistName
+      .trim()
+      .toLowerCase()
+      .replace(/ /g, "-");
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/artist/artistName/${formattedArtistName}`
+      );
+
+      if (response.status === 200) {
+        setIsNameExist(true); // Artist found
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setShowConfirmationModal(true); // Artist not found
+        setError(null);
+        setSuccess(false);
+      } else {
+        console.error("An unexpected error occurred", error);
+        setError("An unexpected error occurred");
+      }
     }
-    setShowConfirmationModal(true);
-    setError(null);
-    setSuccess(false);
   };
 
   const handleConfirmSubmit = async () => {
@@ -310,8 +322,12 @@ const ArtistRegistration = () => {
           isOpen={showConfirmationModal}
           onClose={() => setShowConfirmationModal(false)}
           title="Please select correct option of your city"
-          description="Please select correct option of your city name from the option. Manual City names are not acceptable. If there is any error please contact us at +917021630747"
         >
+          <p className="text-center">
+            Please select correct option of your city name from the option.
+            Manual City names are not acceptable. If there is any error please
+            contact us at +917021630747
+          </p>
           <div className="flex justify-between">
             <button
               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
