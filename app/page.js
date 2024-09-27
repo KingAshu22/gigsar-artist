@@ -105,13 +105,7 @@ function ArtistDashboard() {
       "instruments",
     ];
 
-    const optionalFields = [
-      "time",
-      "instagram",
-      "facebook",
-      "training",
-      "blog",
-    ];
+    const optionalFields = ["time", "instagram"];
 
     const filledRequiredFields = requiredFields.filter(
       (field) => artist[field] && artist[field].length > 0
