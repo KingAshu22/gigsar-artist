@@ -94,11 +94,9 @@ const Header = () => {
     <>
       <div className="flex items-center justify-between p-4 shadow-sm bg-white">
         <div className="flex items-center gap-0">
-          <h3 className="mt-4 font-bold text-gray-600">Artist.</h3>
-          <Link href="/">
+          <Link href="https://gigsar.com" target="_blank">
             <h1 className="font-bold text-4xl text-primary">Gigsar</h1>
           </Link>
-          <h3 className="mt-4 font-bold text-gray-600">.com</h3>
         </div>
         {isMounted && (
           <div className="flex items-center gap-8 md:justify-end">
