@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import * as animationData from "../../../../public/verified.json";
 import LottieImg from "@/app/_components/Lottie";
+import toast from "react-hot-toast";
 
 export default function SignIn() {
   const [phone, setPhone] = useState("");
@@ -86,6 +87,17 @@ export default function SignIn() {
   };
 
   const handlePhoneAuth = () => {
+    if (!phone) {
+      toast.error("Please fill your phone number");
+      return;
+    }
+    // Check for country code +91 and ensure the phone number is exactly 10 digits
+    if (countryCode === "+91") {
+      if (phone.length !== 10) {
+        toast.error("Please enter a valid 10-digit phone number.");
+        return;
+      }
+    }
     if (OTPlessSignin) {
       OTPlessSignin.initiate({
         channel: "PHONE",
