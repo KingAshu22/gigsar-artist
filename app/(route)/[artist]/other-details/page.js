@@ -142,7 +142,7 @@ const EditArtist = ({ params }) => {
                 htmlFor="performanceTime"
                 className="block text-sm font-medium text-gray-700"
               >
-                Performance Time in Mins
+                Performance Time in Mins (Mandatory)
               </label>
               <input
                 type="number"
@@ -172,7 +172,7 @@ const EditArtist = ({ params }) => {
                 htmlFor="instagramLink"
                 className="block text-sm font-medium text-gray-700"
               >
-                Instagram Profile Link
+                Instagram Profile Link (Mandatory)
               </label>
               <input
                 type="text"
