@@ -72,7 +72,7 @@ const ChatWindow = ({ selectedChat, handleBack }) => {
     if (
       lastMessage &&
       lastMessage.isSenderMe &&
-      lastMessage.content.startsWith("Category")
+      lastMessage.content.startsWith("Location")
     ) {
       setShowAvailabilityFooter(true);
       const searchParams = new URLSearchParams(window.location.search);
