@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Modal from "@/app/_components/Modal";
 import { HashLoader } from "react-spinners";
 import Script from "next/script";
+import SingleSearch from "@/app/_components/SingleSearch";
 
 const basicDetails = ({ params }) => {
   const [id, setId] = useState();
@@ -23,12 +24,29 @@ const basicDetails = ({ params }) => {
       setGender(artistData.gender);
       setContactNumber(artistData.contact);
       setEmail(artistData.email);
-      setLocation(artistData.location);
       setArtistType(artistData.artistType);
+
+      // Split location into parts
+      const locationParts = artistData.location
+        ? artistData.location.split(", ")
+        : [];
+      const city = locationParts[0] || "";
+      const state = locationParts[1] || "";
+      const country = locationParts[2] || "";
+
+      // Set country first, then fetch states
+      setSelectedCountry(country);
+
+      // Fetch states and set selected state
+      await getStates(country);
+      setSelectedState(state);
+
+      // Fetch cities based on the state and set selected city
+      await getCities(state);
+      setSelectedCity(city);
     } catch (error) {
-      console.error("Error fetching artists:", error);
+      console.error("Error fetching artist:", error);
     } finally {
-      // Reset loading state
       setFetchData(false);
     }
   };
@@ -47,35 +65,77 @@ const basicDetails = ({ params }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [fetchData, setFetchData] = useState(true);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState();
+  const [selectedState, setSelectedState] = useState();
+  const [selectedCity, setSelectedCity] = useState();
   const router = useRouter();
 
   useEffect(() => {
+    getCountries();
     getArtist();
   }, []);
 
   useEffect(() => {
-    if (inputRef.current) {
-      const initAutocomplete = () => {
-        const autocomplete = new google.maps.places.Autocomplete(
-          inputRef.current,
-          {
-            types: ["(cities)"],
-          }
-        );
-
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          if (place.geometry) {
-            setLocation(place.formatted_address);
-          }
-        });
-      };
-
-      if (typeof google !== "undefined" && google.maps) {
-        initAutocomplete();
-      }
+    if (selectedCountry) {
+      setSelectedState("");
+      setSelectedCity("");
+      getStates(selectedCountry);
     }
-  }, [location]);
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (selectedState) {
+      setSelectedCity("");
+      getCities(selectedState);
+    }
+  }, [selectedState]);
+
+  useEffect(() => {
+    if (selectedCity) {
+      setLocation(`${selectedCity}, ${selectedState}, ${selectedCountry}`);
+    }
+  }, [selectedCity]);
+
+  const getCountries = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API}/countries`
+      );
+      setCountries(response.data);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
+  const getStates = async (country) => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/states`,
+        { countryName: country }
+      );
+      setStates(response.data);
+    } catch (error) {
+      console.error("Error fetching states:", error);
+    }
+  };
+
+  const getCities = async (state) => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/cities`,
+        {
+          countryName: selectedCountry,
+          stateName: state,
+        }
+      );
+      setCities(response.data);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,34 +149,27 @@ const basicDetails = ({ params }) => {
       setShowConfirmationModal(false);
       setIsLoading(true);
 
-      // Clean up location: remove everything after the first comma
-      const formattedLocation = location.split(",")[0].trim();
-
-      // Clean up artist name: remove extra spaces from both ends
       const formattedArtistName = artistName.trim();
 
-      // Handle the submission of form data
       const formData = {
         artistName: formattedArtistName,
         profilePic,
         gender,
         contactNumber,
         email,
-        location: formattedLocation,
+        location,
         artistType,
       };
 
-      const response = axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_API}/edit-basic-details/${id}`,
         formData,
         { withCredentials: true }
       );
     } catch (error) {
-      // Handle error
       console.error("Error submitting form:", error);
       setError(error.message || "An error occurred during submission.");
     } finally {
-      // Reset loading state
       setIsLoading(false);
       setSuccess(true);
     }
@@ -124,26 +177,6 @@ const basicDetails = ({ params }) => {
 
   return (
     <div className="container mx-auto p-5">
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-        onLoad={() => {
-          if (inputRef.current) {
-            const autocomplete = new google.maps.places.Autocomplete(
-              inputRef.current,
-              {
-                types: ["(cities)"],
-              }
-            );
-
-            autocomplete.addListener("place_changed", () => {
-              const place = autocomplete.getPlace();
-              if (place.geometry) {
-                setLocation(place.formatted_address);
-              }
-            });
-          }
-        }}
-      />
       <h1 className="text-xl font-bold mb-4">Artist Registration</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -225,25 +258,26 @@ const basicDetails = ({ params }) => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor="location"
-            className="block text-sm font-medium text-gray-700"
-          >
-            City
-          </label>
-          <input
-            type="text"
-            id="location"
-            value={location}
-            autoComplete="off"
-            ref={inputRef}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="City"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
-          />
-        </div>
+        <SingleSearch
+          type={"Country"}
+          list={countries}
+          selectedItem={selectedCountry}
+          setSelectedItem={setSelectedCountry}
+        />
+
+        <SingleSearch
+          type={"State"}
+          list={states}
+          selectedItem={selectedState}
+          setSelectedItem={setSelectedState}
+        />
+
+        <SingleSearch
+          type={"City"}
+          list={cities}
+          selectedItem={selectedCity}
+          setSelectedItem={setSelectedCity}
+        />
 
         <div className="mb-4">
           <label
@@ -282,12 +316,20 @@ const basicDetails = ({ params }) => {
             </option>
           </select>
         </div>
-        <button
-          type="submit"
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Submit
-        </button>
+        {artistName &&
+          gender &&
+          email &&
+          selectedCountry &&
+          selectedState &&
+          selectedCity &&
+          artistType && (
+            <button
+              type="submit"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Submit
+            </button>
+          )}
       </form>
       {/* Confirmation modal */}
       <Modal
