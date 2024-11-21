@@ -19,15 +19,20 @@ const ArtistChat = () => {
   const getArtistId = async () => {
     // Extract mobile number from the URL
     const searchParams = new URLSearchParams(window.location.search);
-    const mobileFromUrl = searchParams.get("mobile");
+    const idFromUrl = searchParams.get("id");
 
     // Use mobile from URL if present, otherwise fallback to localStorage
-    const mobile = mobileFromUrl || localStorage.getItem("mobile");
+    const id = idFromUrl;
+    // localStorage.getItem("mobile");
 
-    if (mobile) {
+    if (id) {
+      setArtistId(id);
+    } else if (localStorage.getItem("mobile")) {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API}/artist/contact/+${mobile}`
+          `${
+            process.env.NEXT_PUBLIC_API
+          }/artist/contact/+${localStorage.getItem("mobile")}`
         );
         setArtistId(response.data.linkid);
       } catch (error) {
