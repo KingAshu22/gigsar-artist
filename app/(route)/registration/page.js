@@ -110,7 +110,7 @@ const ArtistRegistration = () => {
         email,
         location: formattedLocation, // Use the cleaned-up location
         artistType,
-        showGigsar: false,
+        showGigsar: "hidden",
         showBookMySinger: false,
       };
 
