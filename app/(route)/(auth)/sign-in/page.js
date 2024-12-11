@@ -92,6 +92,12 @@ export default function SignIn() {
       toast.error("Please fill your phone number");
       return;
     }
+
+    // Check if the phone number is exactly 10 digits
+    if (phone.length !== 10 || !/^[0-9]+$/.test(phone)) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
     // Check for country code +91 and ensure the phone number is exactly 10 digits
     if (countryCode === "+91") {
       if (phone.length !== 10) {
@@ -180,7 +186,7 @@ export default function SignIn() {
                 />
               </div>
               <p className="text-sm mt-2">
-                By Signing In you are accepting our{" "}
+                By Signing In, you agree to accept the{" "}
                 <Link
                   href="/terms-and-conditions"
                   target="_blank"

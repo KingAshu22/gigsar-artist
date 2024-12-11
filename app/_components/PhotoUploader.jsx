@@ -198,6 +198,8 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
             onDrop={onFileDrop}
             accept={{ "image/*": [] }}
             maxSize={5000000}
+            maxFiles={1}
+            multiple={false}
           >
             {({ getRootProps, getInputProps }) => (
               <section className="bg-gray-200 rounded-lg p-4 pt-8 pb-8 text-center max-w-36">
