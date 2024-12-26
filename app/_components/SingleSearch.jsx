@@ -73,15 +73,22 @@ const SingleSearch = ({
       )}
       {searchTerm && (
         <ul className="mt-2 border rounded-lg shadow-lg bg-white overflow-hidden">
-          {filteredItems.map((item, index) => (
-            <li
-              key={index}
-              onClick={() => handleSelectItem(item)}
-              className="px-4 py-2 cursor-pointer hover:bg-blue-100"
-            >
-              {item}
-            </li>
-          ))}
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item, index) => (
+              <li
+                key={index}
+                onClick={() => handleSelectItem(item)}
+                className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+              >
+                {item}
+              </li>
+            ))
+          ) : (
+            <p className="text-red-600 font-bold p-2">
+              The {type} could not be found. Kindly verify and search using the
+              correct {type} name.
+            </p>
+          )}
         </ul>
       )}
 
