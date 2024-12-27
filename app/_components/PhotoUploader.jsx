@@ -153,7 +153,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
 
   const handleDeleteImage = async () => {
     try {
-      await deleteImageFromS3(initialImageLink);
+      await deleteImageFromS3(awsLink);
 
       setImageSrc(null);
       setCropData(null);
