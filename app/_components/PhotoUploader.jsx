@@ -153,8 +153,10 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
 
   const handleDeleteImage = async () => {
     try {
+      // Attempt to delete the image using awsLink
       await deleteImageFromS3(awsLink);
 
+      // If the delete operation is successful, reset the state
       setImageSrc(null);
       setCropData(null);
       setShowModal(false);
@@ -162,9 +164,27 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
       setProfilePic(null);
       setAwsLink(null);
     } catch (error) {
-      setError("Error deleting image");
-      console.log(initialImageLink);
-      console.error("Error deleting image:", error);
+      // If an error occurs with awsLink, try with initialImageLink
+      console.error("Error deleting image with awsLink:", error);
+
+      try {
+        await deleteImageFromS3(initialImageLink);
+
+        // Reset the state after successful delete
+        setImageSrc(null);
+        setCropData(null);
+        setShowModal(false);
+        setShowCroppedImage(false);
+        setProfilePic(null);
+        setAwsLink(null);
+      } catch (secondError) {
+        // Handle the error for the second attempt (with initialImageLink)
+        setError("Error deleting image");
+        console.error(
+          "Error deleting image with initialImageLink:",
+          secondError
+        );
+      }
     }
   };
 
