@@ -7,15 +7,17 @@ import {
   S3Client,
   PutObjectCommand,
   ListObjectsCommand,
-  DeleteObjectCommand,
+  DeleteObjectCommand, // Added for deleting the image from S3
 } from "@aws-sdk/client-s3";
 import { nanoid } from "nanoid";
 import { fromBase64 } from "@aws-sdk/util-base64";
 
 const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
+  console.log("InitialImageLink: ", initialImageLink);
+
   const [imageSrc, setImageSrc] = useState(null);
   const [cropData, setCropData] = useState(null);
-  const [zoom, setZoom] = useState(0);
+  const [zoom, setZoom] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [showCroppedImage, setShowCroppedImage] = useState(false);
   const [awsLink, setAwsLink] = useState(initialImageLink);
@@ -24,6 +26,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
 
   useEffect(() => {
     if (initialImageLink && initialImageLink.length > 1) {
+      setAwsLink(initialImageLink);
       setShowCroppedImage(true);
       setCropData(initialImageLink);
     }
@@ -33,7 +36,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
     const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = async () => {
+      reader.onloadend = () => {
         setImageSrc(reader.result);
         setShowModal(true);
         if (isFirstDrop) {
@@ -57,7 +60,6 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
       const croppedImg = await getCroppedImg(imageSrc, croppedArea);
       setCropData(croppedImg);
     } catch (e) {
-      setError("Error cropping image");
       console.error(e);
     }
   };
@@ -77,13 +79,10 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
         const location = await uploadProfileToS3(imageData);
         setProfilePic(location);
         setShowModal(false);
-        setIsFirstDrop(true);
-        setZoom(1);
         setShowCroppedImage(true);
         setAwsLink(location);
       };
     } catch (error) {
-      setError("Error uploading image");
       console.error("Error uploading image:", error);
     }
   };
@@ -101,6 +100,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
       const folderName = artistName.replace(/\s+/g, "-");
       const folderKey = `${folderName}/`;
 
+      // Check if the folder exists
       const listObjectsCommand = new ListObjectsCommand({
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
         Prefix: folderKey,
@@ -108,6 +108,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
       const { Contents } = await s3Client.send(listObjectsCommand);
 
       if (!Contents || Contents.length === 0) {
+        // Create the folder
         const createFolderParams = {
           Bucket: process.env.NEXT_PUBLIC_BUCKET,
           Key: folderKey,
@@ -134,21 +135,13 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
 
       return awsImageUrl;
     } catch (error) {
-      setError("Error uploading image to S3");
       console.error("Error uploading image:", error);
       throw error;
     }
   };
 
-  const handleSave = async () => {
-    if (!cropData) {
-      await handleImageZoom();
-      setTimeout(() => {
-        handleProfileUpload(cropData);
-      }, 1000);
-    } else {
-      handleProfileUpload(cropData);
-    }
+  const handleSave = () => {
+    handleProfileUpload(cropData);
   };
 
   const handleDeleteImage = async () => {
@@ -189,8 +182,10 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
   };
 
   const deleteImageFromS3 = async (imageUrl) => {
+    // Extract the key from the image URL
     const objectKey = new URL(imageUrl).pathname.slice(1);
 
+    // Create S3 client
     const s3Client = new S3Client({
       region: process.env.NEXT_PUBLIC_REGION,
       credentials: {
@@ -206,8 +201,8 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
 
     const deleteCommand = new DeleteObjectCommand(deleteParams);
 
+    // Send delete object command to S3
     await s3Client.send(deleteCommand);
-    console.log("Image Deleted Successfully");
   };
 
   return (
@@ -239,11 +234,16 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
           <div className="relative mb-4">
             <button
               className="absolute top-3 font-bold text-2xl left-32 bg-red-500 w-8 h-8 text-white pb-1 rounded-full"
-              onClick={handleDeleteImage}
+              onClick={() => {
+                handleDeleteImage(awsLink);
+              }}
               type="button"
             >
               x
             </button>
+            <label className="block text-sm font-medium text-gray-700">
+              Profile Pic
+            </label>
             <img
               src={cropData}
               alt="Cropped Image"
@@ -253,7 +253,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
         </>
       )}
       {showModal && imageSrc && (
-        <div className="modal-overlay z-20">
+        <div className="modal-overlay">
           <div className="modal flex flex-col gap-4">
             <Cropper
               src={imageSrc}
@@ -276,6 +276,7 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 type="button"
                 onClick={() => {
+                  // Reset image selection state
                   setImageSrc(null);
                   setShowModal(false);
                 }}
@@ -291,11 +292,6 @@ const PhotoUploader = ({ artistName, setProfilePic, initialImageLink }) => {
               </button>
             </div>
           </div>
-        </div>
-      )}
-      {error && (
-        <div className="text-red-600">
-          <p>{error}</p>
         </div>
       )}
     </>
