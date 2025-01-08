@@ -185,8 +185,10 @@ export default function SignIn() {
                   value={phone}
                   onChange={(e) => {
                     const input = e.target.value;
-                    if (/^\d{0,10}$/.test(input)) {
-                      setPhone(input);
+                    // Remove any non-digit characters, including `.` and `-`
+                    const numericInput = input.replace(/[^0-9]/g, "");
+                    if (numericInput.length <= 10) {
+                      setPhone(numericInput);
                     }
                   }}
                 />
