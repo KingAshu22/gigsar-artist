@@ -162,7 +162,7 @@ export default function SignIn() {
             <div id="mobile-section">
               <label
                 htmlFor="mobile-input"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 mb-3"
               >
                 Mobile Number
               </label>
