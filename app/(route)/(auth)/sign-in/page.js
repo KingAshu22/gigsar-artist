@@ -145,7 +145,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex justify-center p-4">
       {showVerifiedGif ? (
         <div className="flex items-center justify-center">
           <LottieImg animationData={animationData} loop={false} />
