@@ -102,7 +102,7 @@ const EditArtist = ({ params }) => {
             <div className="mb-4">
               <h3>Upload Gallery Images</h3>
               <div className="gallery-uploader-container grid grid-cols-2 md:grid-cols-3 gap-4 justify-center">
-                {[...Array(9)].map((_, index) => (
+                {[...Array(25)].map((_, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <label
                       htmlFor={`galleryImage${index + 1}`}
