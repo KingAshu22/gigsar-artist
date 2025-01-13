@@ -31,7 +31,7 @@ const CalendarComponent = ({ params }) => {
       const artistData = response.data;
       setId(artistData._id);
       setArtistName(artistData.name);
-      setBusyDates(artistData.busyDates);
+      setBusyDates(artistData.busyDates.map((date) => new Date(date)));
     } catch (error) {
       console.error("Error fetching artists:", error);
     }
@@ -42,10 +42,21 @@ const CalendarComponent = ({ params }) => {
   }, []);
 
   const onChange = (date) => {
-    if (busyDates.some((busyDate) => isSameDay(busyDate, date))) {
-      setBusyDates(busyDates.filter((busyDate) => !isSameDay(busyDate, date)));
+    const normalizedDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    if (
+      busyDates.some((busyDate) =>
+        isSameDay(new Date(busyDate), normalizedDate)
+      )
+    ) {
+      setBusyDates(
+        busyDates.filter(
+          (busyDate) => !isSameDay(new Date(busyDate), normalizedDate)
+        )
+      );
     } else {
-      setBusyDates([...busyDates, date]);
+      setBusyDates([...busyDates, normalizedDate]);
     }
   };
 
@@ -53,7 +64,9 @@ const CalendarComponent = ({ params }) => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API}/busyDates/${id}`,
-        { busyDates },
+        {
+          busyDates: busyDates.map((date) => date.toISOString().split("T")[0]),
+        },
         { withCredentials: true }
       );
       console.log("Dates saved successfully:", response.data);
@@ -84,7 +97,7 @@ const CalendarComponent = ({ params }) => {
                 ? "text-gray-400 cursor-default"
                 : ""
             } ${
-              busyDates.some((busyDate) => isSameDay(busyDate, day))
+              busyDates.some((busyDate) => isSameDay(new Date(busyDate), day))
                 ? "bg-red-500 text-white"
                 : ""
             }`}
