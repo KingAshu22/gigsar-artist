@@ -100,7 +100,7 @@ export default function SignIn() {
     if (otp === generatedOtp) {
       setShowVerifiedGif(true);
       localStorage.setItem("authExpiry", (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
-      localStorage.setItem("mobile", phone);
+      localStorage.setItem("mobile", `${countryCode.slice(1)}${phone}`);
       localStorage.setItem("city", "");
       localStorage.setItem("hasRefreshed", "false");
 
