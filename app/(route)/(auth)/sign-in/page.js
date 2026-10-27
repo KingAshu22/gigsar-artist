@@ -10,16 +10,17 @@ import Link from "next/link";
 
 export default function SignIn() {
   const [phone, setPhone] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpSection, setShowOtpSection] = useState(false);
   const [returnUrl, setReturnUrl] = useState("/");
   const [error, setError] = useState("");
-  const [countryCode, setCountryCode] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
   const [countryFlag, setCountryFlag] = useState("");
   const [timer, setTimer] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [showVerifiedGif, setShowVerifiedGif] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -35,10 +36,9 @@ export default function SignIn() {
     fetch("https://ipapi.co/json/")
       .then((response) => response.json())
       .then((data) => {
-        const code = data.country_calling_code;
-        const flag = `https://flagicons.lipis.dev/flags/4x3/${data.country.toLowerCase()}.svg`;
-        setCountryCode(code);
-        setCountryFlag(flag);
+        if (!data.country_calling_code || !data.country) return;
+        setCountryCode(data.country_calling_code);
+        setCountryFlag(`https://flagicons.lipis.dev/flags/4x3/${data.country.toLowerCase()}.svg`);
       })
       .catch((error) => console.error("Error fetching IP data:", error));
   }, []);
@@ -59,6 +59,7 @@ export default function SignIn() {
   };
 
   const handlePhoneAuth = async () => {
+    setError("");
     if (!phone) {
       toast.error("Please fill your phone number");
       return;
@@ -69,46 +70,74 @@ export default function SignIn() {
       return;
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-
+    setSending(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/gigsar-otp`, {
+      const response = await fetch("/api/otp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contactNumber: `${countryCode}${phone}`,
-          otp,
-        }),
+        body: JSON.stringify({ phone: `${countryCode}${phone}` }),
       });
+      const data = await response.json().catch(() => ({}));
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success("WhatsApp OTP sent successfully!");
-        setShowOtpSection(true);
-        startTimer();
-      } else {
+      if (!response.ok) {
         throw new Error(data.message || "Failed to send OTP");
       }
+      toast.success("OTP sent on WhatsApp. Copy it from WhatsApp and paste it here.");
+      setOtp("");
+      setShowOtpSection(true);
+      startTimer();
     } catch (err) {
       toast.error(err.message || "Something went wrong while sending OTP");
+    } finally {
+      setSending(false);
     }
   };
 
-  const handleVerifyOTP = () => {
-    if (otp === generatedOtp) {
+  const handlePasteOtp = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const code = text.replace(/D/g, "").slice(0, 6);
+      if (code) setOtp(code);
+      else toast.error("No OTP found in clipboard");
+    } catch {
+      toast.error("Could not read clipboard. Please paste the OTP manually.");
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    setError("");
+    if (!/^[0-9]{6}$/.test(otp)) {
+      setError("Please enter the 6-digit OTP.");
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      const response = await fetch("/api/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: `${countryCode}${phone}`, otp }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "OTP is incorrect. Please try again.");
+        return;
+      }
+
       setShowVerifiedGif(true);
       localStorage.setItem("authExpiry", (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
-      localStorage.setItem("mobile", `${countryCode.slice(1)}${phone}`);
+      localStorage.setItem("mobile", data.mobile);
       localStorage.setItem("city", "");
       localStorage.setItem("hasRefreshed", "false");
 
       setTimeout(() => {
         router.push(returnUrl);
       }, 2000);
-    } else {
-      setError("OTP is incorrect. Please try again.");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -158,13 +187,15 @@ export default function SignIn() {
               <button
                 onClick={handlePhoneAuth}
                 className={`w-full mt-4 px-4 py-2 rounded-lg text-white transition duration-200 ${
-                  isButtonDisabled
+                  isButtonDisabled || sending
                     ? "bg-primary opacity-75"
                     : "bg-primary hover:bg-red-800"
                 }`}
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled || sending}
               >
-                {isButtonDisabled
+                {sending
+                  ? "Sending..."
+                  : isButtonDisabled
                   ? `Resend WhatsApp OTP in ${timer}s`
                   : "Send WhatsApp OTP"}
               </button>
@@ -175,20 +206,35 @@ export default function SignIn() {
                 <label htmlFor="otp-input" className="block text-sm font-medium text-gray-700">
                   OTP
                 </label>
-                <input
-                  type="text"
-                  id="otp-input"
-                  placeholder="Enter OTP"
-                  maxLength={6}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                />
+                <p className="text-sm text-gray-500 mb-2">
+                  We sent a 6-digit code to your WhatsApp. Tap &quot;Copy code&quot; there and paste it below.
+                </p>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    id="otp-input"
+                    placeholder="Enter OTP"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    className="flex-1 w-full px-4 py-2 border rounded-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-green-500"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/D/g, "").slice(0, 6))}
+                    onKeyDown={(e) => e.key === "Enter" && handleVerifyOTP()}
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePasteOtp}
+                    className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200"
+                  >
+                    Paste
+                  </button>
+                </div>
                 <button
                   onClick={handleVerifyOTP}
-                  className="w-full mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
+                  disabled={verifying}
+                  className={`w-full mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200 ${verifying ? "opacity-75" : ""}`}
                 >
-                  Verify OTP
+                  {verifying ? "Verifying..." : "Verify OTP"}
                 </button>
               </div>
             )}
