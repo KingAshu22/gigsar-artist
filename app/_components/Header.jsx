@@ -83,7 +83,9 @@ const Header = () => {
     }, []);
   }, 2000);
 
-  const handleSignOut = useCallback(() => {
+  const handleSignOut = useCallback(async () => {
+    // Clear the server session cookie first; localStorage is only a UI hint.
+    await fetch("/api/session", { method: "DELETE" }).catch(() => {});
     localStorage.removeItem("mobile");
     localStorage.removeItem("authExpiry");
     window.dispatchEvent(new Event("storage")); // Trigger storage event manually
